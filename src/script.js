@@ -103,47 +103,27 @@ const camera = new THREE.PerspectiveCamera(
   200
 );
 camera.position.z = 3;
-scene.add(camera);
 
-// instantiate a listener
-const audioListener = new THREE.AudioListener();
+window.addEventListener("load", function () {
+  // create an AudioListener and add it to the camera
 
-// add the listener to the camera
-camera.add(audioListener);
+  const audio = "ocean.ogg";
+  const listener = new THREE.AudioListener();
+  scene.add(camera);
 
-// instantiate audio object
-const oceanAmbientSound = new THREE.Audio(audioListener);
+  // create a global audio source
+  const sound = new THREE.Audio(listener);
 
-// add the audio object to the scene
-scene.add(oceanAmbientSound);
-
-// instantiate a loader
-const loader = new THREE.AudioLoader();
-
-// load a resource
-loader.load(
-  // resource URL
-  "ocean.ogg",
-
-  // onLoad callback
-  function (audioBuffer) {
-    // set the audio object buffer to the loaded object
-    oceanAmbientSound.setBuffer(audioBuffer);
-
-    // play the audio
-    oceanAmbientSound.play();
-  },
-
-  // onProgress callback
-  function (xhr) {
-    console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
-  },
-
-  // onError callback
-  function (err) {
-    console.log("An error happened");
-  }
-);
+  // load a sound and set it as the Audio object's buffer
+  const audioLoader = new THREE.AudioLoader();
+  audioLoader.load(audio, function (buffer) {
+    sound.setBuffer(buffer);
+    sound.setLoop(true);
+    sound.setVolume(0.5);
+    sound.play();
+  });
+  camera.add(listener);
+});
 // Controls
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
@@ -184,11 +164,7 @@ const tick = () => {
   particlesGeometry.attributes.position.needsUpdate = true;
 
   camera.lookAt(cube.position);
-  // Camera movement
-  // var tl = gsap.timeline({
-  //   defaults: { duration: 4, ease: "power4.inOut", repeat: -1 },
-  // });
-  // tl.fromTo(camera.position, { x: 10 }, { x: 300 });
+
   // Update Camera
   camera.position.x = Math.cos(elapsedTime) * Math.ceil(10);
   camera.position.y = Math.cos(elapsedTime / 2) * Math.ceil(10);
