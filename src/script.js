@@ -1,7 +1,7 @@
-import "./style.css";
-import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import * as dat from "dat.gui";
+import './style.css';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import * as dat from 'dat.gui';
 
 /**
  * Base
@@ -10,13 +10,13 @@ import * as dat from "dat.gui";
 // const gui = new dat.GUI();
 
 // Canvas
-const canvas = document.querySelector("canvas.webgl");
+const canvas = document.querySelector('canvas.webgl');
 /**
  * Textures
  */
 const textureLoader = new THREE.TextureLoader();
-const particleTexture = textureLoader.load("/textures/particles/9.png");
-const matcapTexture = textureLoader.load("/textures/particles/matcap.jpg");
+const particleTexture = textureLoader.load('/textures/particles/6.png');
+const matcapTexture = textureLoader.load('/textures/particles/matcap.jpg');
 // const backgroundTexture = textureLoader.load("/textures/particles/storm.jpg");
 
 // Scene
@@ -29,31 +29,31 @@ const scene = new THREE.Scene();
 
 // Geometry
 const particlesGeometry = new THREE.BufferGeometry();
-const count = 5000;
+const count = 45;
 
 const positions = new Float32Array(count * 3);
 const colors = new Float32Array(count * 3);
 
 for (let i = 0; i < count; i++) {
-  positions[i] = (Math.random() - 0.5) * 100;
+  positions[i] = Math.random() - 0.5;
   colors[i] = Math.random();
 }
 
 particlesGeometry.setAttribute(
-  "position",
+  'position',
   new THREE.BufferAttribute(positions, 3)
 );
-particlesGeometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
 // Material
 const particlesMaterial = new THREE.PointsMaterial();
-particlesMaterial.size = 0.1;
+particlesMaterial.size = 100.1;
 particlesMaterial.sizeAttenuation = true;
-particlesMaterial.color = new THREE.Color("#ffffff");
+particlesMaterial.color = new THREE.Color('#ffffff');
 particlesMaterial.transparent = true;
 particlesMaterial.alphaMap = particleTexture;
-// particlesMaterial.alphaTest = 0.001;
-// particlesMaterial.depthTest = false;
+particlesMaterial.alphaTest = 0.1;
+particlesMaterial.depthTest = false;
 particlesMaterial.depthWrite = false;
 particlesMaterial.blending = THREE.AdditiveBlending;
 particlesMaterial.vertexColors = true;
@@ -64,11 +64,11 @@ scene.add(particles);
 
 // Cube
 const cube = new THREE.Mesh(
-  new THREE.TorusKnotBufferGeometry(10, 10, 300, 3, 1, 1),
+  new THREE.SphereGeometry(1, 1),
   new THREE.MeshMatcapMaterial({ matcap: matcapTexture })
 );
 cube.receiveShadow = true;
-scene.add(cube);
+// scene.add(cube);
 
 /**
  * Sizes
@@ -78,7 +78,7 @@ const sizes = {
   height: window.innerHeight,
 };
 
-window.addEventListener("resize", () => {
+window.addEventListener('resize', () => {
   // Update sizes
   sizes.width = window.innerWidth;
   sizes.height = window.innerHeight;
@@ -97,32 +97,29 @@ window.addEventListener("resize", () => {
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(
-  300,
+  30,
   sizes.width / sizes.height,
   1.75,
-  200
+  2000
 );
-camera.position.z = 3;
+camera.position.z = 1;
 
-window.addEventListener("load", function () {
+window.addEventListener('load', function () {
   // create an AudioListener and add it to the camera
-
-  const audio = "ocean.ogg";
-  const listener = new THREE.AudioListener();
-  scene.add(camera);
-
+  // const audio = 'ocean.ogg';
+  // const listener = new THREE.AudioListener();
+  // scene.add(camera);
   // create a global audio source
-  const sound = new THREE.Audio(listener);
-
+  // const sound = new THREE.Audio(listener);
   // load a sound and set it as the Audio object's buffer
-  const audioLoader = new THREE.AudioLoader();
-  audioLoader.load(audio, function (buffer) {
-    sound.setBuffer(buffer);
-    sound.setLoop(true);
-    sound.setVolume(0.5);
-    sound.play();
-  });
-  camera.add(listener);
+  // const audioLoader = new THREE.AudioLoader();
+  // audioLoader.load(audio, function (buffer) {
+  //   sound.setBuffer(buffer);
+  //   sound.setLoop(true);
+  //   sound.setVolume(0.5);
+  //   sound.play();
+  // });
+  // camera.add(listener);
 });
 // Controls
 const controls = new OrbitControls(camera, canvas);
@@ -141,34 +138,33 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
  * Animate
  */
 const clock = new THREE.Clock();
-console.log("cube", particlesMaterial);
+console.log('cube', particlesMaterial);
 
 const tick = () => {
-  const elapsedTime = clock.getElapsedTime() / 6;
+  const elapsedTime = clock.getElapsedTime() / 10;
   const currentTime = Date.now();
   const deltaTime = currentTime - elapsedTime;
   // Update controls
   controls.update();
 
   // Update Particles
-  //   particles.position.z = -elapsedTime * 0.2;
+  // particles.rotateZ = -elapsedTime * 0.2;
 
-  for (let j = 0; j < count; j++) {
-    const p3 = j;
-    const y = particlesGeometry.attributes.position.array[p3 + 1];
-    particlesGeometry.attributes.position.array[p3 + 10] = Math.sin(
-      elapsedTime + y
-    );
-    particlesMaterial.size = Math.random();
-  }
-  particlesGeometry.attributes.position.needsUpdate = true;
+  // for (let j = 0; j < count; j++) {
+  //   const p3 = j * 10;
+  //   const y = particlesGeometry.attributes.position.array[p3];
+  //   particlesGeometry.attributes.position.array[p3] = Math.sin(elapsedTime * y);
+  //   particlesMaterial.size = Math.random();
+  // }
+  // particlesGeometry.attributes.position.needsUpdate = false;
 
   camera.lookAt(cube.position);
 
   // Update Camera
-  camera.position.x = Math.cos(elapsedTime) * Math.ceil(10);
-  camera.position.y = Math.cos(elapsedTime / 2) * Math.ceil(10);
-  camera.position.z = Math.tan(elapsedTime / 3);
+  // camera.position.x = Math.cos(elapsedTime) * Math.ceil(1);
+  camera.position.y = Math.cos(elapsedTime) * Math.ceil(3);
+  // camera.position.z = Math.tan(elapsedTime) * Math.ceil(1);
+
   // Render
   renderer.render(scene, camera);
 
